@@ -5,6 +5,7 @@ import fsspec
 import os
 
 from pytorch_lightning import Trainer, LightningModule
+from pytorch_lightning.callbacks import Callback
 from ray.util import PublicAPI
 
 from ray_lightning.session import put_queue, get_actor_rank
@@ -25,6 +26,18 @@ except ImportError:
     get_tune_resources = Unavailable
 
     TUNE_INSTALLED = False
+
+
+class TuneCallback(Callback):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def on_validation_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
+        self._handle(trainer=trainer, pl_module=pl_module)
+
+    def _handle(self, trainer, pl_module):
+        raise NotImplementedError
+
 
 if TUNE_INSTALLED:
 
